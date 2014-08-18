@@ -130,7 +130,6 @@
                 WeixinJSBridge.call('hideToolbar');
             });
             window.PRELOAD_RES =[
-                STATIC_URL+"/images/play-cloud.png?41",
                 STATIC_URL+"/images/bg.png?41",
                 STATIC_URL+"/images/play-music.png?41"
             ];
@@ -178,7 +177,7 @@
                                 page.hide();
                                 play.show();
                                 clearInterval(timer);
-                                //new $.Cloud(cloud);
+                                new $.Cloud(cloud);
                             }
                         },13)
                     }

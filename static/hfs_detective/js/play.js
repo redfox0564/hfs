@@ -9,7 +9,6 @@
      */
     var CLOUD_IMAGE_SRC ='./img/play-cloud.png';
 
-
     /*
      * 简单 MP3播放控件
      * play的时候就重头开始播放，不做播放进度的缓冲
@@ -65,7 +64,7 @@
      */
 
     function Scratchcard(canvas,callback){
-         this.init(canvas,callback);
+        this.init(canvas,callback);
     }
 
     Scratchcard.prototype = {
@@ -148,7 +147,7 @@
                 if ( self.redata ){
 
                     data = self.ctx.getImageData(self.redata.left,self.redata.top
-                                ,self.redata.width,self.redata.height).data;
+                        ,self.redata.width,self.redata.height).data;
 
                     for (var i = 0, j = 0; i < data.length; i += 4) {
                         if (data[i] && data[i+1] && data[i+2] && data[i+3]){
@@ -165,14 +164,16 @@
             }
         },
 
-        reset: function(){
+        reset: function(si){
 
             if (typeof this.callback.onReset =='function'){
 
                 //这里简单处理，用耦合的方式获得数据
 
-                this.redata = this.callback.onReset(this.ctx);;
+                this.redata = this.callback.onReset(this.ctx,si);
             }
+
+            this.ctx.globalCompositeOperation = 'destination-out';
         }
     }
 
@@ -191,7 +192,7 @@
 
             this.init(this.cloudImage = image);
         } else {
-            
+
             var image = new Image,
                 self  = this;
 
@@ -212,28 +213,24 @@
 
             //判断是否有答案数据
             if ( typeof window.hfs_data !=='undefined' ) {
-
                 self.data = hfs_data;
+                self.nowtime = +new Date;
 
+                //创建场景
                 self.iboard();
                 //刮刮卡
                 self.icard();
-                //倒计时+tab切换
-                self.itab();
-                //创建节点
+                //tab切换
+                self.itabswitch();
+                self.icountdown();
 
-                self.bind();
             }
         },
         //初始化画板
         iboard: function(){
 
             var self = this,
-                data = self.data,
-                nowstep = parseInt(localStorage.getItem('now')||0,10);
-
-            //当前线索序号
-            self.step = nowstep;
+                data = self.data;
 
             //放置线索的舞台节点
             self.board = $('.play_board');
@@ -245,64 +242,220 @@
 
                 //图片线索
                 if ( value.type=='image' ){
-                    element = new Image;
-                    element.src =value.source;
 
+                    element = $('<div class="player-image"><img src="'+value.source+'"/></div>')
                     self.clues.push({
-                        element : $(element).appendTo(self.board),
-                        time : value.time
+                        element : element.appendTo(self.board),
+                        time : value.opentime
                     });
-                //音乐线索
+
+                    //音乐线索
                 } else {
                     element = $('<div class="player-mp3"><div data-index="'
-                                +index+'" class="mp3player-play"></div></div>').appendTo(self.board)
+                        +index+'" class="mp3player-play"></div></div>').appendTo(self.board)
 
                     player = new MP3Player(value.source);
 
                     self.clues.push({
                         element : element,
                         player  : player,
-                        time: value.time
+                        time: value.opentime
                     });
                     //这里简单绑定下事件，不用代理处理
                     element.find('div').on('click',function(){
-                       player. toggle(function(status){
+                        player. toggle(function(status){
 
-                           element[status!='stop'
+                            element[status!='stop'
                                 ?'addClass':'removeClass']('mp3player-stop')
 
-                       });
+                        });
                     });
 
                 }
             });
 
+
+            //初始化
+            var start = parseInt(localStorage.getItem('start'),10),
+                nows = self.clues[0].time;
+            if ( start != nows){
+                localStorage.setItem('open_0',0);
+                localStorage.setItem('open_1',0);
+                localStorage.setItem('open_2',0);
+                localStorage.setItem('start',nows);
+            }
+
+
         },
         //初始化选项卡，线索切换，以及线索定时切换
-        itab: function(){
+        itabswitch: function(){
             var tab = $('.play_tab li'),
+                self = this,
                 data = self.data,
-                //记录当前时间
-                nowtime = +new Date;
+            //记录当前时间
+                nowtime = self.nowtime,
+                step    = parseInt(localStorage.getItem('now')||0,10),
+            //  urlstep = location.href.match(/step=(\d+)/),
+                nopen   = -1;//当前没有解开的线索ID
+
+            self.tab = tab;
+
+            //遍历数据，初始化解锁状态
+            data.forEach(function(item,index){
+                var time = item.opentime,
+                    wrap = tab.eq(index).find('.state');
+
+                if ( time <= nowtime ) {
+                    //当前线索已解锁
+                    //localStorage.setItem('open_'+index,1);
+                    wrap.html('（已解锁）')
+                        .parent().addClass('unlock');
+
+                } else {
+                    //记录最近的没有解锁线索
+                    if (nopen ==-1){
+                        nopen = index;
+                        //    localStorage.setItem('now',step = Math.max(0,index-1));
+                    }
+                    //localStorage.setItem('open_'+index,0);
+                    wrap.html('（待解锁）');
+                }
+            });
+
+            //判断URL里面是否有选中的参数
+            //if ( urlstep ){
+
+            //    localStorage.setItem('now',step=parseInt(urlstep[1],10))
+            //}
+
+            //线索选中状态以及绑定事件
+            //console.log(nopen);
+            //if (nopen!=-1) {
+            if (!$('.next').length) {
+                self.switchTab(self.step = step);
+            } else {
+                self.hideClues();
 
 
-            data.forEach(function(index,item){
+                self.card.hide();
+                self.cloud.hide();
+            }
+            //}
+            tab.on('click',function(){
+                var me = $(this),
+                    index = parseInt(me.attr('data-index'),10);
+                if (me.hasClass('unlock')) {
+                    self.switchTab(self.step=index);
+                }
+            });
 
-            })
-
-
-
+            //存放lock索引
+            self.lock = nopen;
         },
-        //初始化线索解锁倒计时
-        itimer: function(){
-            var self = this;
+        //切换tab状态
+        switchTab: function(index){
+            var tab    = $('.play_tab li'),
+                unlock = localStorage.getItem('open_'+index),
+                self   = this;
 
-                self.timer = $('.play_timer');
+            tab.removeClass('cur').eq(index).addClass('cur');
+            localStorage.setItem('now',index);
+            self.hideClues();
+            self.container.addClass('active');
 
-            if ( self.timer.length ) {
+            //当前线索解锁的时候
+            if ( unlock =='1') {
+                //self.helper.hide();
+                self.card.hide();
+                self.cloud.hide();
+                self.clues[index].element.show();
+            } else {
+                //self.helper.show();
+                self.card.show();
+                self.cloud.show();
 
+                self.clues[index].element.show();
+                self.reset();
             }
         },
+        hideClues: function(){
+            if (this.clues.length) {
+                this.clues.forEach(function (item) {
+                    item.element.hide();
+                });
+            }
+        },
+
+        //初始化线索解锁倒计时
+        icountdown: function(){
+
+            function res(o,num){
+                var html =[];
+                o.html('');
+
+                num = num < 10
+                    ? '0'+num : ''+num;
+
+                num.split('').forEach(function(e){
+                    html.push('<b>'+e+'</b>');
+                });
+
+                o.html(html.join(''));
+            }
+
+            return function(){
+                var self = this,
+                    clue ,
+                    timerwrap = $('.play_timer'),
+                    tspan = timerwrap.find('span'),
+                    hwrap   = tspan.eq(0),
+                    mwrap   = tspan.eq(1),
+                    swrap   = tspan.eq(2),
+                    nowtime = self.nowtime,
+                    time =0,cf;
+
+
+                if (clue = self.clues[self.lock]) {
+
+                    time = clue.time - nowtime;
+                }
+
+                self.timer = setInterval( cf = function(){
+
+                    if ( (time -= 1000)>=0 ) {
+                        var kt =  time /1000;
+                        var h   = Math.floor(kt /3600),//小时
+                            mis = Math.floor(kt % 3600),//多少秒
+                            m   = Math.floor(mis/60),
+                            s   = Math.floor(mis%60);
+                        if (timerwrap.length) {
+                            res(hwrap, h);
+                            res(mwrap, m);
+                            res(swrap, s);
+                        }
+
+                        //倒计时结束
+                    } else{
+                        //
+                        clearInterval(self.timer);
+                        //修改tab状态，耦合了。。。。
+                        self.tab.eq(self.lock).addClass('unlock')
+                            .find('.state').html('（已解锁）');
+                        //localStorage.setItem('open_'+self.lock,1);
+                        //释放下一线索，
+                        if ( ++self.lock<=2 ) {
+                            self.icountdown();
+                        } else {
+                            timerwrap.remove();
+                        }
+                    }
+                },1000);
+
+                cf( time+=1000 );
+                //}
+            }
+
+        }(),
         //初始化刮刮卡
         icard: function(){
             var self = this,
@@ -310,7 +463,7 @@
                 cloud = $('<canvas></canvas>').appendTo(self.cloud)[0];
 
             self.card   = $(card);
-            self.helper   = $('<div class="player-helper"></div>').appendTo(self.container);
+            //self.helper   = $('<div class="player-helper"></div>').appendTo(self.container);
 
             self.cloudctx = cloud.getContext('2d');
             self.cardctx  = card.getContext('2d');
@@ -319,73 +472,73 @@
             card.height =cloud.height = self.cloud.height();
 
             self.scard = new Scratchcard(card,
-            {
-                //当涂抹到50%的时候触发
-                onUnlock: function(ctx){
-                    //云淡化
-                    var clue = self.clues[self.step];
-
-                    self.helper.hide();
-                    self.card.animate({opacity:.3},1000,function(){
-
-                        clue.element.show();
-                        self.card.css('opacity',1).hide();
-
-                        //标记当前线索已解开
-                        localStorage.setItem('open_'+self.step,1);
-
-                        //触发unlock事件
-                        self.onUnlock && self.onUnlock(self.step);
-                    });
-
-                    self.cloud.animate({opacity:.3},1000,function(){
-                        self.cloud.css('opacity',1).hide();
-                    })
-
-                },
-                //reset的时候调用事件
-                onReset: function(ctx){
-
-                    var context  = self.cloudctx,
-                       offset   = self.board.offset(),
-                       coffset  = self.cloud.offset(),
-                       left     = offset.left-coffset.left,
-                       top      = offset.top-coffset.top,
-                       width    = self.board.width(),
-                       height   = self.board.height();
+                {
+                    //当涂抹到50%的时候触发
+                    onUnlock: function(ctx){
+                        //云淡化
+                        var clue = self.clues[self.step];
 
 
-                   ctx.drawImage(self.cloudImage,0,0,card.width,card.height);
-                   ctx.clearRect(0,0,card.width,top);
-                   ctx.clearRect(0,0,left,card.height);
-                   ctx.clearRect(left+width,top+height,left,top);
-                   ctx.clearRect(left,top+height,card.width,top);
-                   ctx.clearRect(left+width,top,left,card.height);
+                        self.card.animate({opacity:.3},1000,function(){
 
-                   //画背景
+                            clue.element.show();
+                            self.card.css('opacity',1).hide();
 
-                   context.drawImage(self.cloudImage,0,0,card.width,card.height);
-                   //去掉中间区域
-                   context.clearRect(left,top,width,height);
-                   //返回坐标共card调用
-                   //这里耦合了下。。减少代码
-                   return {
-                       width: width,
-                       height: height,
-                       top: top,
-                       left: left
-                   }
-                }
-            });
+                            //标记当前线索已解开
+                            localStorage.setItem('open_'+self.step,1);
+
+                            //触发unlock事件
+                            self.onUnlock && self.onUnlock(self.step);
+                        });
+
+                        self.cloud.animate({opacity:.3},1000,function(){
+                            self.cloud.css('opacity',1).hide();
+                        })
+
+                    },
+                    //reset的时候调用事件
+                    onReset: function(ctx,noback){
+
+                        var context = self.cloudctx,
+                            offset  = self.board.offset(),
+                            coffset = self.cloud.offset(),
+                            left    = offset.left-coffset.left,
+                            top     = offset.top-coffset.top,
+                            width   = self.board.width(),
+                            height  = self.board.height();
+
+                        ctx.globalCompositeOperation='source-over';
+                        ctx.clearRect(left,top,width,height);
+                        ctx.drawImage(self.cloudImage,0,0,card.width,card.height);
+                        ctx.clearRect(0,0,card.width,top);
+                        ctx.clearRect(0,0,left,card.height);
+                        ctx.clearRect(left+width,top+height,left,top);
+                        ctx.clearRect(left,top+height,card.width,top);
+                        ctx.clearRect(left+width,top,left,card.height);
+
+                        //画背景
+                        context.clearRect(0,0,cloud.width,cloud.height);
+                        context.drawImage(self.cloudImage, 0, 0, card.width, card.height);
+                        //去掉中间区域
+                        context.clearRect(left, top, width, height);
+
+                        //返回坐标共card调用
+                        //这里耦合了下。。减少代码
+                        return {
+                            width  : width,
+                            height : height,
+                            top    : top,
+                            left   : left
+                        }
+                    }
+                });
         },
 
         //重置reset
-        bind: function(){
-
+        reset: function(){
+            this.scard.reset();
         }
     }
 
     $.Cloud = Cloud;
 })(Zepto);
-
-new Zepto.Cloud();
