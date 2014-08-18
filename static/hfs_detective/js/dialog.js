@@ -1,7 +1,3 @@
-/**
- * 弹出框
- *
-  */
 Dialog = (function() {
     var win = window;
 
@@ -18,14 +14,14 @@ Dialog = (function() {
 
         initView: function(s) {
             var html = [
-                '<div class="dialog" id="dialog">',
+                '<div class="dialog bg-{{=it.bg}}" id="dialog">',
                 '<div class="dialog-head">',
                 '{{ if (it.icon) { }}<a class="close">关闭</a>{{ } }}',
                 '</div>',
                 '<div class="dialog-content">{{=it.content}}</div>',
                 '<div class="dialog-foot"></div>',
                 '</div>',
-                '<div class="mask" class="mask"></div>'
+                '<div class="mask" id="mask"></div>'
             ],
 
             tplFn,
@@ -42,8 +38,8 @@ Dialog = (function() {
             tplFn = doT.template(html.join(''));
             $('body').append(tplFn(s));
 
-            elem = $('#dialog');
-            mask = $('#mask');
+            this.elem = elem = $('#dialog');
+            this.mask = mask = $('#mask');
 
             // 设置居中样式
             elem.css({
@@ -53,20 +49,23 @@ Dialog = (function() {
 
             // 关闭事件 
             $('.close', elem).on('click', function(e) {
+               // done();
+
                 elem.remove();
                 mask.remove();  
-
-                done();
-            });
+        	return false;   
+	 });
 
             // 点击确定按钮
             $('.button', elem).on('click', function(e) {
-                elem.remove();
-                mask.remove();     
-
                 done();
             });
-        }
+        },
+
+	hide: function() {
+		this.elem.remove();	
+		this.mask.remove();
+	}
     };
 
     return Dialog;

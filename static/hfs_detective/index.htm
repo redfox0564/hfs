@@ -120,7 +120,7 @@
         </div>
 		<?php
 			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/zepto.js?version='.Yii::app()->params['version']);
-			/*$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/play.js?version='.Yii::app()->params['version']);*/
+			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/play.js?version='.Yii::app()->params['version']);
 			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/dialog.js?version='.Yii::app()->params['version']);
 			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/ctrl.js?version='.Yii::app()->params['version']);
 			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/doT.js?version='.Yii::app()->params['version']);
@@ -130,6 +130,7 @@
                 WeixinJSBridge.call('hideToolbar');
             });
             window.PRELOAD_RES =[
+                STATIC_URL+"/images/play-cloud.png?41",
                 STATIC_URL+"/images/bg.png?41",
                 STATIC_URL+"/images/play-music.png?41"
             ];

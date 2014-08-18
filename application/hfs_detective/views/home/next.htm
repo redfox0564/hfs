@@ -8,48 +8,42 @@
         <meta name="apple-touch-fullscreen" content="no"/>
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
         <meta name="format-detection" content="telephone=no"/>
-		<?php
-			$cs = Yii::app()->clientScript;
-			$cs->registerCssFile(Yii::app()->params['static_url'].'/css/base.css?version='.Yii::app()->params['version']);
-			$cs->registerCssFile(Yii::app()->params['static_url'].'/css/play.css?version='.Yii::app()->params['version']);
-			$cs->registerCssFile(Yii::app()->params['static_url'].'/css/next.css?version='.Yii::app()->params['version']);
-		?>
+        <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/next.css" />
     </head>
     <body>
-    <div class="hfs page">
-        <h1 class="schedule-one">第一季</h1>
-        <h2>拨开云雾寻找答案</h2>
-        <div class="play_container">
-            <div class="play_cloud"></div>
-            <div class="play_board"></div>
-            <div class="play_timer">
-                <h3>距离下一条线索还有</h3>
+    <div class="hfs page next">
+        <div class="content">
+            <h1 class="schedule-one">第一季</h1>
+            <h2>拨开云雾寻找答案</h2>
+            <div class="main">
+                <div class="board"></div>
+                <div class="buttons">
+                    <span>真想即将揭晓...</span>
+                </div>
             </div>
-            <div class="play_button">
-                <a>真想即将揭晓...</a>
+            <div class="routes">
+                <ul class="nav">
+                    <li data-index="0">
+                        <p>
+                            <a>线索1</a>
+                        </p>
+                        <p class="state">（待解锁）</p>
+                    </li>
+                    <li data-index="1">
+                        <p>
+                            <a>线索2</a>
+                        </p>
+                        <p class="state">（待解锁）</p>
+                    </li>
+                    <li class="cur" data-index="2">
+                        <p>
+                            <a>线索3</a>
+                        </p>
+                        <p class="state">（已解锁）</p>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <div class="play_tabwrap">
-            <ul class="play_tab">
-                <li class="cur" data-index="0">
-                <p>
-                <a>线索1</a>
-                </p>
-                <p class="state">（待解锁）</p>
-                </li>
-                <li data-index="1">
-                <p>
-                <a>线索2</a>
-                </p>
-                <p class="state">（待解锁）</p>
-                </li>
-                <li data-index="2">
-                <p>
-                <a>线索3</a>
-                </p>
-                <p class="state">（待解锁）</p>
-                </li>
-            </ul>
         </div>
     </div>
     <body>

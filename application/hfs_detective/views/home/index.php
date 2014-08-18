@@ -17,7 +17,7 @@
         <script>
             var date = +new Date;
 			var hfs_data = <?php echo json_encode($clues);?>;
-			var ans = <?php echo $answer;?>;
+			var ans = <?php echo '"'.$answer.'"';?>;
         </script>
     </head>
     <body>
@@ -63,7 +63,7 @@
                     </span>
                 </section>
                 <section class="links">
-                    <span class="link">活动说明 ></span>
+                    <a href="/hfs_detective/index.php?r=home/wapIndex&source=local" class="link">活动说明 >a>
                 </section>
             </div>
         </div>
@@ -77,7 +77,10 @@
 
 
         <div class="play page" id="play" style="display:none;">
-            <h1 class="schedule-one">第一季</h1>
+          <div class="header">
+                <a class="back" href="/hfs_detective/index.php?r=home/wapIndex&amp;source=local">返回首页</a>
+            </div>
+	    <h1 class="schedule-one">第一季</h1>
             <h2>拨开云雾寻找答案</h2>
             <div class="play_container">
                 <div class="play_cloud"></div>
@@ -93,7 +96,7 @@
                     </div>
                 </div>
                 <div class="play_button">
-                    <a class="real">写出真相</a>
+                    <a  class="real">写出真相</a>
                 </div>
             </div>
 

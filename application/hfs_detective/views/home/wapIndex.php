@@ -93,7 +93,10 @@
 
 
         <div class="play page" id="play" style="display:none;">
-            <h1 class="schedule-one">第一季</h1>
+           <div class="header">
+                <a class="back" href="/hfs_detective/index.php?r=home/wapIndex&amp;source=local">返回首页</a>
+            </div> 
+	   <h1 class="schedule-one">第一季</h1>
             <h2>拨开云雾寻找答案</h2>
             <div class="play_container">
                 <div class="play_cloud"></div>

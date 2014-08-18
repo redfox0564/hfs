@@ -17,10 +17,14 @@
         <script>
             var date = +new Date;
 			var hfs_data = <?php echo json_encode($clues);?>;
+			var ans = <?php echo '"'.$answer.'"';?>;
         </script>
     </head>
     <body>
         <div class="hfs page">
+	<header class="header">
+                <a class="past">往季真相>></a>
+            </header>	
             <div class="content">
                 <section class="text-desc">
                     <p>人人都有做侦探的潜质，只有真正的实力</p>
@@ -62,7 +66,7 @@
                     </span>
                 </section>
                 <section class="links">
-                    <span class="link">活动说明 ></span>
+                    <a href="/hfs_detective/index.php?r=home/tutorial&source=local" class="link">活动说明 ></a>
                 </section>
             </div>
         </div>
@@ -76,7 +80,10 @@
 
 
         <div class="play page" id="play" style="display:none;">
-            <h1 class="schedule-one">第一季</h1>
+        <div class="header">
+                <a class="back" href="/hfs_detective/index.php?r=home/wapIndex&amp;source=local">返回首页</a>
+            </div>    
+	<h1 class="schedule-one">第一季</h1>
             <h2>拨开云雾寻找答案</h2>
             <div class="play_container">
                 <div class="play_cloud"></div>
@@ -125,7 +132,21 @@
 			$cs->registerScriptFile(Yii::app()->params['static_url'].'/js/doT.js?version='.Yii::app()->params['version']);
 		?>
         <script>
-            document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+             var shareData = {
+                img_url: "",
+                img_width: 200,
+                img_height: 200,
+                link: '阿迪飞洒的说法',
+                desc: '',
+                title: '是发顺丰发的撒手 ',
+                appid: 0
+            };
+	    window.wxcallback = function(){
+			//跳�到表单页面
+		window.location.href ="/hfs_detective/index.php?r=home/userinfo"	
+	    }
+
+	    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
                 WeixinJSBridge.call('hideToolbar');
             });
             window.PRELOAD_RES =[
