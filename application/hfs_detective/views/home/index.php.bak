@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>海飞丝实力音乐侦探</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-touch-fullscreen" content="no"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+        <meta name="format-detection" content="telephone=no"/>
+<?php
+	$cs = Yii::app()->clientScript;
+	$cs->registerCssFile(Yii::app()->params['static_url'].'/css/base.css?version='.Yii::app()->params['version']);
+    	$cs->registerCssFile(Yii::app()->params['static_url'].'/css/index.css?version='.Yii::app()->params['version']);
+?>
+    </head>
+    <body>
+        <div class="hfs page">
+            <div class="content">
+                <section class="text-desc">
+                    <p>人人都有做侦探的潜质，只有真正的实力</p>
+                    <p>派才能打破迷局。看线索，猜歌名，赢取大</p>
+                    <p>礼！谁的青春高八度？够实力，你就来！</p>
+                </section>
+                <section class="prizes">
+                    <ul>  
+                        <li>
+                            <div class="pic"> 
+                                <img src="<?php echo Yii::app()->params['static_url']?>/images/001.png?_v<?php echo Yii::app()->params['version'];?>" /> 
+                            </div>
+                            <div class="name">
+                                <span>海飞丝洗发产品</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="pic"> 
+                            	<img src="<?php echo Yii::app()->params['static_url']?>/images/001.png?_v<?php echo Yii::app()->params['version'];?>" />
+			    </div>
+                            <div class="name">
+                                <span>蔡依林音乐CD</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="pic"> 
+                                <img src="<?php echo Yii::app()->params['static_url']?>/images/001.png?_v<?php echo Yii::app()->params['version'];?>" />
+                            </div>
+                            <div class="name">
+                                <span>iPhone专用音箱底座</span>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+                <section class="buttons">
+                    <span class="btn">
+                        马上开始
+                        <span class="search-icon"></span>
+                    </span>
+                </section>
+                <section class="links">
+                    <span class="link">活动说明 ></span>
+                </section>
+            </div>
+        </div>
+    <body>
+</html>
